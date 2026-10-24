@@ -19,11 +19,21 @@
       if (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) {
         document.getElementById("status-bar-style").setAttribute("content", "black");
       }
-      // A pairing link carries its key in the fragment. Move it out of the address
-      // bar before the router boots, so it never lands in history or screenshots.
+      // A pairing link carries its key in the fragment (never sent to a server).
+      // In the installed app, move it out of the address bar before the router boots.
       if (/[#&]k=/.test(location.hash)) {
         try { sessionStorage.setItem("nus-study-pending-pairing", location.hash); } catch (e) {}
-        history.replaceState(null, "", location.pathname + location.search);
+        var standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+        if (standalone) {
+          history.replaceState(null, "", location.pathname + location.search);
+        } else {
+          // Opened in the browser (e.g. from the QR): keep the link in place so
+          // "Add to Home Screen" carries it, and drop the manifest so iOS uses this
+          // URL instead of start_url. The app shows an install-and-pair page.
+          try { sessionStorage.setItem("nus-study-install-mode", "1"); } catch (e) {}
+          var manifest = document.querySelector('link[rel="manifest"]');
+          if (manifest) manifest.parentNode.removeChild(manifest);
+        }
       }
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => navigator.serviceWorker.register(new URL("sw.js", document.baseURI)).catch(() => {}));
@@ -56,6 +66,6 @@
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
-  <script src="/nus-study/_expo/static/js/web/__expo-metro-runtime-97703ae02682710149335928b974f18d.js" defer></script><script src="/nus-study/_expo/static/js/web/__common-651864f66795d612352b49b49f8829a7.js" defer></script><script src="/nus-study/_expo/static/js/web/entry-84260bfc634872071482e855ab173fdf.js" defer></script>
+  <script src="/nus-study/_expo/static/js/web/__expo-metro-runtime-97703ae02682710149335928b974f18d.js" defer></script><script src="/nus-study/_expo/static/js/web/__common-46a9009399ec0c04c07cc5787230d93c.js" defer></script><script src="/nus-study/_expo/static/js/web/entry-df505ce94cbb30bbc34cbf6a4d0f4118.js" defer></script>
 </body>
 </html>
