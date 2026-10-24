@@ -1,0 +1,14 @@
+{
+  "canvas.ts": "3d82530736ccfce2400e36d84e04c566e695bf5dcec139deb2258ac5532ecfa4",
+  "domain.ts": "809cb1cdac535f97588f6db7c9f34adae9c93af17b21330389fc2894e2eaec2b",
+  "records.ts": "fa22eccf6aae3f02da8436097b921ba6ce8f9331ebd09c30625a0ebb8d3ffc25",
+  "reviewed.ts": "7feb1fc98cd16f1f91e77a5beaeabed5aec824faf7e9d0f960ef3997c4e5d665",
+  "grades.ts": "4bb61b7d92a8204e4316926b0f39000304da74d4159ad905abf0b8c282f516e9",
+  "due.ts": "3593fb6277ec4aba411060afc0394ad0ea43f34a13ed1cc7b72a41598c28cad8",
+  "dates.ts": "b7dce68893e7fbf3794efb9d0ac1af31664785fcea1d3cc4c8f89d48629e8db6",
+  "sourcePdfs.ts": "6be8bf042a9c7eb0c0a8f3db7acd8f6d5bb09a6370b6a799bdaebba504768e4d",
+  "timetable.ts": "da70466db07316aa608b4c20675547280b1ace7bf2eeca2b939000b870d7a246",
+  "sealed.ts": "da6eeb690a8d8d118bf2357396394a848a2e876e3695854b2373b971de166c8c",
+  "snapshot.ts": "4e16905367939dff06ec5239f7e1f3be42f1d19da1486fa9fb4a38eac07deb2f",
+  "download.ts": "f557a3624661ad3f22dde8fcf98cf3a246cda72ada265ebfd3a237fe6eed5931"
+}

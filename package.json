@@ -1,0 +1,38 @@
+{
+  "name": "nus-study-kit",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Builds your own encrypted NUS Study pack from Canvas, NUSMods and your agent's courseware review, for the NUS Study web app.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "canvas:auto": "node scripts/auto-connect.mjs",
+    "canvas:token": "node scripts/token-input.mjs",
+    "canvas:browser:install": "playwright install chromium",
+    "sync": "node --experimental-strip-types --no-warnings scripts/sync.ts",
+    "timetable": "node --experimental-strip-types --no-warnings scripts/timetable.ts",
+    "documents": "node --experimental-strip-types --no-warnings scripts/documents.ts",
+    "review:check": "node --experimental-strip-types --no-warnings scripts/review-check.ts",
+    "pack": "node --experimental-strip-types --no-warnings scripts/pack.ts",
+    "publish": "node --experimental-strip-types --no-warnings scripts/publish.ts",
+    "refresh": "npm run sync && npm run documents && npm run pack && npm run publish",
+    "status": "node --experimental-strip-types --no-warnings scripts/status.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --no-warnings --test tests/*.test.mjs",
+    "privacy:check": "node scripts/privacy-check.mjs"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^6.4.299",
+    "playwright": "1.64.0",
+    "qrcode": "^1.5.4",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.19",
+    "typescript": "~6.0.3",
+    "@types/qrcode": "^1.5.5"
+  }
+}

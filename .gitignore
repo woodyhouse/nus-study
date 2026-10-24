@@ -1,0 +1,6 @@
+node_modules/
+# Everything personal stays here: encrypted token, store key, Canvas snapshot,
+# downloaded files, extracted text, review results, pack key and Gist ID.
+.local/
+.env.local
+*.log
