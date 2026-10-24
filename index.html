@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+    <title>NUS Study</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="NUS Study" />
+    <meta id="status-bar-style" name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F2F2F7" />
+    <meta name="referrer" content="no-referrer" />
+    <script>
+      // iOS reads the Home Screen status bar style at launch: black for dark mode.
+      if (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.getElementById("status-bar-style").setAttribute("content", "black");
+      }
+      // A pairing link carries its key in the fragment. Move it out of the address
+      // bar before the router boots, so it never lands in history or screenshots.
+      if (/[#&]k=/.test(location.hash)) {
+        try { sessionStorage.setItem("nus-study-pending-pairing", location.hash); } catch (e) {}
+        history.replaceState(null, "", location.pathname + location.search);
+      }
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => navigator.serviceWorker.register(new URL("sw.js", document.baseURI)).catch(() => {}));
+      }
+    </script>
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      /* These styles make the body full-height */
+      html,
+      body {
+        height: 100%;
+      }
+      /* These styles disable body scrolling if you are using <ScrollView> */
+      body {
+        overflow: hidden;
+      }
+      /* These styles make the root element full-height */
+      html, body { background: #F2F2F7; }
+      @media (prefers-color-scheme: dark) { html, body { background: #000; } }
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+  <link rel="icon" href="/nus-study/favicon.ico"/></head>
+
+  <body>
+    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
+    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <!-- The root element for your Expo app. -->
+    <div id="root"></div>
+  <script src="/nus-study/_expo/static/js/web/__expo-metro-runtime-97703ae02682710149335928b974f18d.js" defer></script><script src="/nus-study/_expo/static/js/web/__common-bcdf18894021e8772e3197c4337de80b.js" defer></script><script src="/nus-study/_expo/static/js/web/entry-84260bfc634872071482e855ab173fdf.js" defer></script>
+</body>
+</html>
