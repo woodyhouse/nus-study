@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtempSync,mkdirSync,writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {parseShareLink,meetingsFor,examFor,weeksText,academicYear} from '../src/nusmods.ts';
+import {parseShareLink,meetingsFor,examFor,weeksText,academicYear,autoChoose,parseChoices,currentSemester} from '../src/nusmods.ts';
 import {buildPack} from '../src/buildPack.ts';
 import {checkReview,loadReviewed,reviewQueue,normalize} from '../src/review.ts';
 import {extractText} from '../src/pdfText.ts';
@@ -29,6 +29,18 @@ test('NUSMods lessons become meetings; exams convert to Singapore time',()=>{
  assert.equal(examFor(nusmodsModule,2),null);
  assert.equal(weeksText({start:'x'}),'');
  assert.equal(academicYear(new Date('2026-10-24')),'2026-2027');assert.equal(academicYear(new Date('2027-07-15')),'2026-2027');assert.equal(academicYear(new Date('2027-08-01')),'2027-2028');
+});
+
+test('automatic timetable picks single-class lessons and asks only about the rest',()=>{
+ const first=autoChoose(nusmodsModule,1);
+ assert.deepEqual(first.chosen,{TUT:['03']});
+ assert.deepEqual(first.unresolved.map(u=>[u.course,u.abbrev,u.options.map(o=>o.classNo)]),[['AB1234','LEC',['1','2']]]);
+ assert.deepEqual(first.unresolved[0].options[0].slots,['周四 09:00–10:00 LT0']);
+ const answered=autoChoose(nusmodsModule,1,{LEC:['2'],TUT:['99']});
+ assert.deepEqual(answered.chosen,{LEC:['2'],TUT:['03']});assert.equal(answered.unresolved.length,0);
+ assert.deepEqual(parseChoices('ab1234:tut=03,lec=2; CD5678:LAB=3C'),{AB1234:{TUT:['03'],LEC:['2']},CD5678:{LAB:['3C']}});
+ assert.throws(()=>parseChoices('AB1234 TUT 03'),/CODE:TUT=12/);
+ assert.equal(currentSemester(new Date('2026-10-24')),1);assert.equal(currentSemester(new Date('2027-02-01')),2);
 });
 
 test('quotes are checked against the cited page; only exact matches become source-backed',()=>{

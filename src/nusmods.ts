@@ -54,3 +54,37 @@ export function examFor(module:ModuleData,semester:number):Exam|null{
 }
 // NUS academic years start in August.
 export function academicYear(now=new Date()):string{const y=now.getUTCFullYear(),start=now.getUTCMonth()>=7?y:y-1;return `${start}-${start+1}`;}
+
+// Automatic mode: start from the Canvas course codes. A lesson type with a single
+// class is chosen outright; types with several classes need the student's answer.
+export type Unresolved={course:string;lessonType:string;abbrev:string;options:{classNo:string;slots:string[]}[]};
+const DAY_ZH=['','周一','周二','周三','周四','周五','周六','周日'];
+export function autoChoose(module:ModuleData,semester:number,given:Record<string,string[]>={}):{chosen:Record<string,string[]>;unresolved:Unresolved[]}{
+  const lessons=module.semesterData.find(s=>s.semester===semester)?.timetable||[];
+  const byType=new Map<string,{type:string;classes:Map<string,Lesson[]>}>();
+  for(const l of lessons){
+    const abbrev=LESSON_ABBREV[l.lessonType]??l.lessonType,entry=byType.get(abbrev)??{type:l.lessonType,classes:new Map()};
+    entry.classes.set(l.classNo,[...(entry.classes.get(l.classNo)??[]),l]);byType.set(abbrev,entry);
+  }
+  const chosen:Record<string,string[]>={},unresolved:Unresolved[]=[];
+  for(const [abbrev,{type,classes}] of byType){
+    const pick=given[abbrev]?.filter(c=>classes.has(c));
+    if(pick?.length)chosen[abbrev]=pick;
+    else if(classes.size===1)chosen[abbrev]=[...classes.keys()];
+    else unresolved.push({course:module.moduleCode,lessonType:type,abbrev,options:[...classes].map(([classNo,ls])=>({classNo,
+      slots:ls.map(l=>`${DAY_ZH[DAYS[l.day]]??l.day} ${hhmm(l.startTime)}–${hhmm(l.endTime)} ${l.venue||''}`.trim())}))});
+  }
+  return {chosen,unresolved};
+}
+// "CS2040:TUT=12,LAB=3C;MA1521:LEC=2" -> {CS2040:{TUT:['12'],LAB:['3C']},MA1521:{LEC:['2']}}
+export function parseChoices(text=''):Record<string,Record<string,string[]>>{
+  const out:Record<string,Record<string,string[]>>={};
+  for(const part of text.split(';').map(s=>s.trim()).filter(Boolean)){
+    const m=part.match(/^([A-Z]{2,4}\d{4}[A-Z]{0,3}):(.+)$/i);if(!m)throw new Error(`Cannot read choice "${part}"; use CODE:TUT=12,LAB=3C`);
+    const code=m[1].toUpperCase();out[code]??={};
+    for(const kv of m[2].split(',')){const [k,v]=kv.split('=').map(s=>s?.trim());if(!k||!v)throw new Error(`Cannot read "${kv}" in ${code}`);out[code][k.toUpperCase()]=[v];}
+  }
+  return out;
+}
+// Semester 1 runs Aug–Dec, Semester 2 Jan–May; special terms are not handled.
+export function currentSemester(now=new Date()){return now.getUTCMonth()>=6?1:2;}

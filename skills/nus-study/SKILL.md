@@ -25,8 +25,15 @@ under `.local/`, except the courseware text you are asked to review.
    `npm run canvas:token` in their own terminal and paste an existing token there.
 4. **Sync.** `npm run sync`. `unavailable` lists sections Canvas refused; that is
    not evidence that nothing exists there.
-5. **Timetable.** Ask for the NUSMods share link (NUSMods → Timetable → Share/Sync →
-   copy link). Run `npm run timetable -- "<link>"`. Report modules in `missing`.
+5. **Timetable.** Run `npm run timetable`. It takes the course codes from the Canvas
+   sync and the public NUSMods data; lesson types with a single class are chosen
+   automatically. If `needsChoice` is not empty, read the `unresolved` options in
+   `.local/timetable.json` and ask the student, in ONE message, which class they
+   are in for each (e.g. "CS2040 Tutorial: which class?"), then run
+   `npm run timetable -- --choose "CS2040:TUT=12,LAB=3C"`. Choices are remembered.
+   If the student prefers, a NUSMods share link (Timetable → Share/Sync) resolves
+   everything at once: `npm run timetable -- "<link>"`. Codes in `missing` are
+   Canvas sites that are not NUSMods modules for this semester; just report them.
 6. **Documents.** `npm run documents` downloads new or changed PDFs and writes
    `.local/review-queue.json`. If `deferred` > 0, run it again later.
 7. **Courseware review.** For each queue item follow
@@ -60,7 +67,8 @@ under `.local/`, except the courseware text you are asked to review.
 
 ## When things change
 
-- New semester: the student sends a new NUSMods link; rerun `npm run timetable`.
+- New semester: after the first sync of the new term, rerun `npm run timetable`
+  (add `--sem 2` if needed) and ask about any new `needsChoice`.
 - `npm run status` summarises local state at any time without secrets.
 - To stop: delete the scheduled task; the student can delete the Gist on GitHub
   and unpair in the app (设置 → 取消配对并清除本机数据).
