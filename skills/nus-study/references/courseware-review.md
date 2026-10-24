@@ -1,6 +1,6 @@
 # Courseware review (Extraction v1)
 
-This is the core of NUS Study: many professors put dates, venues and rules only in
+This is the core of Due 了么: many professors put dates, venues and rules only in
 slides, briefs, announcements and Canvas pages, not in Canvas due dates.
 
 For each item in `.local/review-queue.json`, read `textFile` (per-page text of one

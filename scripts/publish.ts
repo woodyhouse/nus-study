@@ -31,7 +31,7 @@ const content=JSON.stringify(await sealPack(pack,key));
 writeFileSync(local(FILE),content,{mode:0o600});
 
 let gist=readJson(local('gist.json'));
-const body={description:'NUS Study sealed pack (encrypted)',files:{[FILE]:{content}}};
+const body={description:'Due 了么 sealed pack (encrypted)',files:{[FILE]:{content}}};
 if(gist?.id)gh(['api','-X','PATCH',`/gists/${gist.id}`,'--input','-'],JSON.stringify(body));
 else{
   const created=JSON.parse(gh(['api','-X','POST','/gists','--input','-'],JSON.stringify({...body,public:false})));

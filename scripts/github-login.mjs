@@ -19,7 +19,7 @@ if(process.argv.includes('--worker')){
   const gh=findGh();
   if(!gh){note('gh-missing');console.error('GitHub CLI is not installed. Ask your agent to install it, then run this again.');}
   else{
-    console.log('NUS Study — GitHub sign-in\nA browser opens: sign in and enter the one-time code shown here. Never paste it into chat.\n');
+    console.log('Due 了么 — GitHub sign-in\nA browser opens: sign in and enter the one-time code shown here. Never paste it into chat.\n');
     spawnSync(gh,['auth','login','--hostname','github.com','--git-protocol','https','--web','--scopes','gist'],{stdio:'inherit'});
     if(ghLoggedIn(gh)){note('logged-in');console.log('\nSigned in. Go back to your agent.');}
     else{note('failed');console.error('\nSign-in did not complete. Ask your agent to open this window again.');}

@@ -29,7 +29,7 @@ export function hiddenInput(input=stdin,output=stdout){
 async function main(){
   try{
     const config=environment();
-    console.log('NUS Study — personal Canvas token\nThe token is hidden, verified with one read-only request, and stored encrypted on this computer only.\n');
+    console.log('Due 了么 — personal Canvas token\nThe token is hidden, verified with one read-only request, and stored encrypted on this computer only.\n');
     console.log('Create one at: '+config.base+'/profile/settings (New access token)');
     note('waiting');stdout.write('Paste your token, then press Enter (input hidden): ');
     let token=await hiddenInput();

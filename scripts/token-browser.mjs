@@ -8,7 +8,7 @@ export async function prepareTokenDialog(page, options = {}) {
   if (base.protocol !== 'https:' || base.username || base.password || base.pathname !== '/' || base.search || base.hash) {
     throw new Error('Use an authorized HTTPS Canvas origin.');
   }
-  const purpose = options.purpose ?? 'NUS Study personal pack';
+  const purpose = options.purpose ?? 'Due 了么 personal pack';
   const days = options.days ?? 30;
   if (!Number.isInteger(days) || days < 1 || days > 89) throw new Error('Expiry must be between 1 and 89 days.');
   const now = new Date(options.now ?? Date.now());

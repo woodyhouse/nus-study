@@ -68,7 +68,7 @@ async function worker(){
     phase='token';note('awaiting-confirmation',{purpose:prepared.purpose,expiresAt:prepared.expiresAt});
     const accepted=await generateAndStore(page,config,prepared,async details=>{
       console.log(`\nCanvas: ${config.base}\nPurpose: ${details.purpose}\nExpires: ${details.expiresAt}`);
-      console.log('Canvas tokens can carry more than read access; NUS Study only sends read-only GET requests.');
+      console.log('Canvas tokens can carry more than read access; Due 了么 only sends read-only GET requests.');
       console.log('Create a NEW token and store it encrypted on this computer? Type YES to confirm.');
       return (await input.question('Confirmation: ')).trim()==='YES';
     });

@@ -1,9 +1,9 @@
 ---
 name: nus-study
-description: Set up and refresh a student's NUS Study pack — read-only Canvas sync, NUSMods timetable, review of course files and Canvas text (announcements, descriptions, pages) for dates professors only publish there, encrypted publishing to the student's own secret Gist, phone pairing, and a 48-hour refresh.
+description: Set up and refresh a student's Due 了么 pack — read-only Canvas sync, NUSMods timetable, review of course files and Canvas text (announcements, descriptions, pages) for dates professors only publish there, encrypted publishing to the student's own secret Gist, phone pairing, and a 48-hour refresh.
 ---
 
-# NUS Study pack
+# Due 了么 pack
 
 Repository: https://github.com/woodyhouse/nus-study (branch `main`). Web app:
 https://woodyhouse.github.io/nus-study/. Read `AGENTS.md` first; its rules apply
@@ -63,7 +63,7 @@ Then start, and remind them right before each login window opens.
    module pages). PDF pages without a text layer are rendered to PNG
    (`pageImages`). It writes `.local/review-queue.json`. If `files.deferred` or
    `pageImagesDeferred` > 0, run it again.
-7. **Courseware review — the core of NUS Study.** Many professors publish dates
+7. **Courseware review — the core of Due 了么.** Many professors publish dates
    only in slides, briefs and announcements, never as Canvas due dates. Review
    EVERY queue item (all formats, all courses) following
    [courseware review](references/courseware-review.md), then run
@@ -79,7 +79,7 @@ Then start, and remind them right before each login window opens.
    secret Gist and opens `.local/pairing.html` with a QR code. Tell the student:
    - Scan the QR with the iPhone Camera and open the link in Safari.
    - The page guides Share → Add to Home Screen (do it in the light/dark mode they
-     normally use); opening NUS Study from the Home Screen pairs automatically.
+     normally use); opening Due 了么 from the Home Screen pairs automatically.
    - Already installed? Tap 复制配对链接 on that page, then in the app
      设置 → 从剪贴板粘贴并配对.
    Ask them to confirm pairing. Never read or print the pairing link yourself.
