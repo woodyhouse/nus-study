@@ -5,6 +5,7 @@ import {recordOf,type StudyRecord} from './core/records.ts';
 import type {Snapshot} from './core/domain.ts';
 import type {Meeting} from './core/timetable.ts';
 import type {Exam} from './nusmods.ts';
+import {consolidate} from './consolidate.ts';
 
 export type Timetable={meetings:Meeting[];exams:Exam[]};
 
@@ -23,7 +24,8 @@ export function examRecord(exam:Exam,courseId:number|null):StudyRecord{
     review:{status:'source-backed',fieldEvidence:{title:[source],timing:[source]},conflicts:[]}};
 }
 
-export function buildPack({snapshot,timetable=null,reviewed=[]}:{snapshot:Snapshot;timetable?:Timetable|null;reviewed?:StudyRecord[]}):ReviewedPack{
+export function buildPack({snapshot,timetable=null,reviewed:found=[]}:{snapshot:Snapshot;timetable?:Timetable|null;reviewed?:StudyRecord[]}):ReviewedPack{
+  const reviewed=consolidate(found);
   if(snapshot.demo||!snapshot.accountKey)throw new Error('Sync Canvas first (no account-bound snapshot).');
   const courseId=new Map(snapshot.courses.map(c=>[c.code,c.id]));
   // Reuse the phone's reconciliation: reviewed facts merge into the matching

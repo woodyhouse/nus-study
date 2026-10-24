@@ -13,7 +13,7 @@ export async function extractText(bytes:Uint8Array):Promise<{pages:{page:number;
       const content=await (await pdf.getPage(n)).getTextContent();
       const text=content.items.map((i:any)=>(i.str??'')+(i.hasEOL?'\n':' ')).join('').replace(/[ \t]+\n/g,'\n').trim();
       total+=text.length;
-      if(total>MAX_CHARS)throw new Error('More than 1M characters of text.');
+      if(total>MAX_CHARS)throw new Error('More than 3M characters of text.');
       // Near-empty pages are usually scans; the agent may need to view them.
       if(text.replace(/\s/g,'').length<30)ocrRequiredPages.push(n);
       pages.push({page:n,text});

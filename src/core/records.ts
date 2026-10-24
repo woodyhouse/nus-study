@@ -63,11 +63,14 @@ export function eventFromRecord(input:unknown,prior?:Event):Event{
     detail:record.blocks.filter(b=>b.kind==='text').map(b=>b.text).join('\n'),url:record.sources.find(s=>s.url)?.url||'',record};
 }
 export const ExtractionSchema=z.strictObject({schemaVersion:z.literal(1),documentId:z.string(),hash:z.string().regex(/^[a-f0-9]{64}$/),records:z.array(RecordSchema).max(200)});
-export function validateExtraction(input:unknown,document:{id:string;course:string;hash:string;pageCount:number}):StudyRecord[]{
+// PDFs cite a page; Canvas text (announcements, descriptions, pages, slides)
+// cites the source as a whole or a slide/page number.
+export function validateExtraction(input:unknown,document:{id:string;course:string;hash:string;pageCount:number;text?:boolean}):StudyRecord[]{
   const value=ExtractionSchema.parse(input);
   if(value.documentId!==document.id||value.hash!==document.hash)throw new Error('解析结果与原始文件版本不一致。');
+  const located=(s:StudyRecord['sources'][number])=>document.text?(s.kind==='announcement'||s.kind==='canvas-api')&&(s.page===null||s.page<=document.pageCount):s.kind==='pdf'&&s.page!==null&&s.page<=document.pageCount;
   return value.records.map(r=>{
-    if(r.course!==document.course||!r.sources.length||r.sources.some(s=>s.kind!=='pdf'||s.documentId!==document.id||s.hash!==document.hash||s.page===null||s.page>document.pageCount||!s.quote.trim()))throw new Error('解析结果缺少有效的文件页码和原文证据。');
+    if(r.course!==document.course||!r.sources.length||r.sources.some(s=>!located(s)||s.documentId!==document.id||s.hash!==document.hash||!s.quote.trim()))throw new Error('解析结果缺少有效的文件页码和原文证据。');
     const ids=new Set(r.sources.map(s=>s.id));
     if(Object.values(r.review.fieldEvidence).flat().some(id=>!ids.has(id)))throw new Error('字段证据引用无效。');
     // A parser/model cannot grant its own verification badge.

@@ -6,7 +6,7 @@ import {attachSourceFileLinks} from './sourcePdfs.ts';
 export type Course = { id: number; code: string; name: string; color: string };
 export type Event = { id: string; course: string; type: 'assignment'|'quiz'|'announcement'|'academic'|'exam'|'midterm'|'material'; title: string; date: string|null; time: string; submitted: boolean; detail: string; url: string; record?:StudyRecord; personal?:{read:boolean;done:boolean} };
 export type SourceDocument = {
-  id:string; course:string; title:string; kind:'pdf'|'file'|'module'|'syllabus';
+  id:string; course:string; title:string; kind:'pdf'|'file'|'module'|'syllabus'|'page';
   url:string; modifiedAt:string|null; metadataVersion:string; text:string;
   status:'awaiting-pdf-reader'|'awaiting-analysis'|'index-only'|'locked';
   extraction?:{schemaVersion:1;hash:string;metadataVersion:string;pages:{page:number;text:string}[];ocrRequiredPages:number[];extractedAt:string};

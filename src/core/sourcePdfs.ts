@@ -6,12 +6,21 @@ export type SelectedPdf=SourcePdf&{accountKey:string|null};
 const normalize=(text:string)=>text.normalize('NFKC').toLowerCase().replace(/[\s_\-–—]/g,'');
 export function canvasSourceUrl(value:string){if(!value.trim())return '';try{const url=new URL(value,'https://canvas.nus.edu.sg');return url.origin==='https://canvas.nus.edu.sg'&&!url.username&&!url.password?url.origin+url.pathname:'';}catch{return '';}}
 export function sourceFileId(value:string){return canvasSourceUrl(value).match(/\/(?:courses\/\d+\/)?files\/(\d+)(?:\/download)?$/)?.[1]||null;}
+// Canvas file links inside rich text (announcements, descriptions, pages).
+export function fileLinks(html:unknown):{id:string;title:string;url:string}[]{
+  if(typeof html!=='string')return [];
+  const found=new Map<string,{id:string;title:string;url:string}>();
+  for(const match of html.matchAll(/<a\b[^>]*\bhref\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
+    const url=canvasSourceUrl(match[1].replace(/&amp;/g,'&')),id=sourceFileId(url);if(!id||found.has(id))continue;
+    found.set(id,{id,title:match[2].replace(/<[^>]+>/g,'').trim()||'Canvas 附件',url});
+  }
+  return [...found.values()];
+}
 export function attachSourceFileLinks(event:Event,html:unknown):Event{
   if(typeof html!=='string')return event;
   const record=recordOf(event),seen=new Set(record.sources.map(s=>s.documentId));
-  for(const match of html.matchAll(/<a\b[^>]*\bhref\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
-    const url=canvasSourceUrl(match[1].replace(/&amp;/g,'&')),id=sourceFileId(url);if(!id||seen.has('file-'+id))continue;
-    const title=match[2].replace(/<[^>]+>/g,'').trim()||'Canvas 附件';seen.add('file-'+id);
+  for(const {id,title,url} of fileLinks(html)){
+    if(seen.has('file-'+id))continue;seen.add('file-'+id);
     record.sources.push({id:'attachment-'+id,kind:/\.pdf\b/i.test(title)?'pdf':'canvas-api',title,url,documentId:'file-'+id,page:null,quote:'',hash:null});
   }
   return {...event,record};
