@@ -1,7 +1,7 @@
 // Per-page text from PDF bytes with pdf.js (v6 never evals; no font loading).
 import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
 
-const MAX_PAGES=500,MAX_CHARS=1_000_000;
+const MAX_PAGES=1000,MAX_CHARS=3_000_000;
 
 export async function extractText(bytes:Uint8Array):Promise<{pages:{page:number;text:string}[];ocrRequiredPages:number[]}>{
   const task=getDocument({data:bytes,disableFontFace:true,useSystemFonts:false,verbosity:0});

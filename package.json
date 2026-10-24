@@ -12,6 +12,7 @@
     "canvas:auto": "node scripts/auto-connect.mjs",
     "canvas:token": "node scripts/token-input.mjs",
     "canvas:browser:install": "playwright install chromium",
+    "github:login": "node scripts/github-login.mjs",
     "sync": "node --experimental-strip-types --no-warnings scripts/sync.ts",
     "timetable": "node --experimental-strip-types --no-warnings scripts/timetable.ts",
     "documents": "node --experimental-strip-types --no-warnings scripts/documents.ts",

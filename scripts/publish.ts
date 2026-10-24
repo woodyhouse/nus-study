@@ -8,19 +8,23 @@ import QRCode from 'qrcode';
 import {newPackKey,pairingFragment,sealPack} from '../src/core/sealed.ts';
 import {pairingPage} from '../src/pairingPage.ts';
 // @ts-expect-error plain ESM helper without type declarations
+import {findGh,ghLoggedIn} from '../lib/gh.mjs';
+// @ts-expect-error plain ESM helper without type declarations
 import {readJson,writeJsonAtomic,local} from '../lib/store.mjs';
 
 const APP=process.env.NUS_STUDY_APP_URL||'https://woodyhouse.github.io/nus-study/',FILE='nus-study-pack.json';
+const GH:string|null=findGh();
 const gh=(args:string[],input?:string)=>{
-  const r=spawnSync('gh',args,{input,encoding:'utf8',maxBuffer:64*1024*1024});
-  if(r.error)throw new Error('GitHub CLI (gh) is not installed. Install it, then run "gh auth login" in your own terminal.');
+  if(!GH)throw new Error('GitHub CLI (gh) is not installed. Install it, then run npm run github:login.');
+  const r=spawnSync(GH,args,{input,encoding:'utf8',maxBuffer:64*1024*1024});
+  if(r.error)throw new Error('GitHub CLI (gh) could not be started.');
   if(r.status!==0)throw new Error(`gh ${args.slice(0,3).join(' ')} failed: ${(r.stderr||'').split('\n')[0].slice(0,200)}`);
   return r.stdout;
 };
 
 const pack=readJson(local('pack.json'));
 if(!pack)throw new Error('Run npm run pack first.');
-if(spawnSync('gh',['auth','status'],{encoding:'utf8'}).status!==0)throw new Error('Not logged in to GitHub CLI. Run "gh auth login" in your own terminal (the agent must not handle it).');
+if(!ghLoggedIn(GH))throw new Error('Not signed in to GitHub. Run npm run github:login; the student signs in in the window it opens.');
 if(!existsSync(local('pack-key.txt')))writeFileSync(local('pack-key.txt'),newPackKey()+'\n',{mode:0o600});
 const key=readFileSync(local('pack-key.txt'),'utf8').trim();
 const content=JSON.stringify(await sealPack(pack,key));

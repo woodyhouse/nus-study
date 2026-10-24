@@ -4,6 +4,7 @@
 import {stdin,stdout} from 'node:process';
 import {createInterface} from 'node:readline/promises';
 import {execFileSync} from 'node:child_process';
+import {existsSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {root,environment,note,hasToken,storePersonalToken} from '../lib/store.mjs';
@@ -24,6 +25,25 @@ export async function generateAndStore(page,config,prepared,confirm,store=storeP
   let value=(await tokenField.textContent())?.trim()||'';
   try{await store(config,value);}finally{value='';}
   return true;
+}
+
+// Short, non-secret failure reason for the agent (no URLs with query strings).
+const reason=error=>`${error?.name||'Error'}: ${String(error?.message||error).split('\n')[0].replace(/\?\S*/g,'?…')}`.slice(0,160);
+async function pause(){
+  if(!stdin.isTTY)return;
+  stdout.write('\nPress Enter to close this window.');stdin.setRawMode?.(true);stdin.resume();
+  await new Promise(done=>stdin.once('data',done));
+}
+
+// Before opening any window: make sure Chromium is installed and really starts.
+async function ensureBrowser(){
+  const {chromium}=await import('playwright');
+  const install=force=>execFileSync(process.execPath,[resolve(root,'node_modules/playwright/cli.js'),'install',...(force?['--force']:[]),'chromium'],{stdio:'inherit'});
+  const works=async()=>{try{const b=await chromium.launch({headless:true});await b.close();return true;}catch{return false;}};
+  if(!existsSync(chromium.executablePath())){console.log('Installing Chromium for the Canvas login window (one time)…');install(false);}
+  if(await works())return;
+  console.log('Chromium did not start; reinstalling it once…');install(true);
+  if(!(await works()))throw new Error('Chromium still does not start after reinstalling.');
 }
 
 async function worker(){
@@ -54,16 +74,22 @@ async function worker(){
     });
     if(!accepted){note('cancelled');console.log('Cancelled. No token was created.');return;}
     note('verified');console.log('Token verified and encrypted locally. Nothing was printed or copied. Go back to your agent.');
-  }catch{
-    note('failed',{stage:phase});
+  }catch(error){
+    note('failed',{stage:phase,reason:reason(error)});
+    console.error('\n'+reason(error));
     console.error(phase==='browser'?'Browser or login failed. Run npm run canvas:browser:install, then retry.':'Token creation did not complete. Do not create another automatically; check Canvas settings for an unused token. Saved credentials were kept.');
     process.exitCode=1;
   }finally{input.close();if(browser)await browser.close().catch(()=>{});}
+  // Keep the window open so the student can see what happened.
+  if(process.exitCode)await pause();
 }
 
 async function main(){
   if(process.argv.includes('--worker'))return worker();
   execFileSync(process.execPath,[resolve(root,'scripts/setup.mjs')],{cwd:root,stdio:'ignore'});
+  if(!hasToken()||process.argv.includes('--replace')){
+    try{await ensureBrowser();}catch(error){note('failed',{stage:'browser-preflight',reason:reason(error)});console.error(reason(error));process.exitCode=1;return;}
+  }
   note('launching');
   if(!launchNativeTerminal(fileURLToPath(import.meta.url),root,['--worker',...(process.argv.includes('--replace')?['--replace']:[])])){
     note('launch-failed');

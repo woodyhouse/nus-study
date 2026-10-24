@@ -17,10 +17,13 @@ under `.local/`, except the courseware text you are asked to review.
    distro package). The student must have a GitHub account.
 2. **Checkout.** Clone into a dedicated folder (reuse an existing clone; pull only
    when the tree is clean). Run `npm ci`, `npm test`, `npm run setup`.
-3. **Canvas token (the student acts).** Run `npm run canvas:browser:install`, then
-   `npm run canvas:auto`. A separate window opens: the student logs in to Canvas
-   (with MFA) and types YES. Poll `.local/token-status.json` until `verified`;
-   `cancelled`/`failed` means stop and ask. Never retry token creation on your own.
+3. **Canvas token (the student acts).** Run `npm run canvas:auto`. It first checks
+   that Chromium is installed and starts (installing or reinstalling it once if
+   needed), then opens a separate window: the student logs in to Canvas (with MFA)
+   and types YES. Poll `.local/token-status.json` until `verified`. On `failed`,
+   read its `stage` and `reason` (never secret), fix what you can (e.g. a
+   `browser-preflight` failure), and ask before reopening. The window stays open on
+   errors so the student can read them. Never retry token creation on your own.
    Fallback when the browser flow cannot run: ask the student to run
    `npm run canvas:token` in their own terminal and paste an existing token there.
 4. **Sync.** `npm run sync`. `unavailable` lists sections Canvas refused; that is
@@ -40,15 +43,19 @@ under `.local/`, except the courseware text you are asked to review.
    [courseware review](references/courseware-review.md), then run
    `npm run review:check` until `rejected` is empty. `needsReview` and
    `quoteMismatches` are allowed but report them.
-8. **GitHub login (the student acts).** If `gh auth status` fails, ask the student
-   to run `gh auth login` in their own terminal. Do not run it for them.
+8. **GitHub login (the student acts).** Install the GitHub CLI if missing, then run
+   `npm run github:login`. It finds `gh` even if the fresh install is not on PATH
+   yet, and if not signed in opens a window where the student completes the web
+   sign-in. Poll `.local/github-status.json` until `logged-in`. Never type or read
+   the one-time code.
 9. **Publish.** `npm run pack`, then `npm run publish`. The first publish creates a
    secret Gist and opens `.local/pairing.html` with a QR code. Tell the student:
-   - In iPhone Safari open the web app, Share → Add to Home Screen (in the
-     light/dark mode they normally use; iOS fixes the status bar style then).
-   - Scan the QR with the Camera, long-press the link → Copy (do not open it).
-   - Open NUS Study from the Home Screen → 设置 → 从剪贴板粘贴并配对.
-   Never read or print the pairing link yourself.
+   - Scan the QR with the iPhone Camera and open the link in Safari.
+   - The page guides Share → Add to Home Screen (do it in the light/dark mode they
+     normally use); opening NUS Study from the Home Screen pairs automatically.
+   - Already installed? Tap 复制配对链接 on that page, then in the app
+     设置 → 从剪贴板粘贴并配对.
+   Ask them to confirm pairing. Never read or print the pairing link yourself.
 10. **Schedule.** With the student's agreement, create ONE recurring task in your own
     scheduler (every 48 hours) that runs "Periodic refresh" below. Check for an
     existing task first; never create duplicates. If you have no scheduler, tell

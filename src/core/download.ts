@@ -2,7 +2,8 @@
 import {getAll} from './canvas.ts';
 import type {SourceDocument} from './domain.ts';
 const LIMIT=25*1024*1024;
-export async function downloadPdf(doc:SourceDocument,token:string,fetcher:typeof fetch=fetch):Promise<Uint8Array<ArrayBuffer>>{
+// The phone keeps 25 MB; a desktop caller may pass a larger limit.
+export async function downloadPdf(doc:SourceDocument,token:string,fetcher:typeof fetch=fetch,limit=LIMIT):Promise<Uint8Array<ArrayBuffer>>{
   if(doc.kind!=='pdf'||doc.status==='locked'||!/^file-\d+$/.test(doc.id))throw new Error('此材料无法作为 PDF 下载。');
   const [file]=await getAll('/files/'+doc.id.slice(5),token,fetcher);
   if(file?.locked_for_user||file?.hidden_for_user)throw new Error('Canvas 已限制此文件的访问。');
@@ -12,9 +13,9 @@ export async function downloadPdf(doc:SourceDocument,token:string,fetcher:typeof
   const response=await fetcher(url.href,{signal:AbortSignal.timeout(60000)});
   if(response.url&&new URL(response.url).protocol!=='https:')throw new Error('下载连接不安全，未解析。');
   if(!response.ok)throw new Error('PDF 下载失败，请重试。');
-  if(Number(response.headers.get('content-length'))>LIMIT)throw new Error('PDF 超过 25 MB，请使用较小文件。');
+  if(Number(response.headers.get('content-length'))>limit)throw new Error(`PDF 超过 ${Math.round(limit/1048576)} MB，请使用较小文件。`);
   const bytes=new Uint8Array(await response.arrayBuffer());
-  if(bytes.length>LIMIT)throw new Error('PDF 超过 25 MB，请使用较小文件。');
+  if(bytes.length>limit)throw new Error(`PDF 超过 ${Math.round(limit/1048576)} MB，请使用较小文件。`);
   if(!String.fromCharCode(...bytes.subarray(0,1024)).includes('%PDF-'))throw new Error('下载内容不是 PDF，未解析。');
   return bytes;
 }

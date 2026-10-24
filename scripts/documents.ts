@@ -1,5 +1,5 @@
 // Downloads new or changed course PDFs (read-only), extracts per-page text and
-// writes the review queue for the agent. Limits: 25 MB, 500 pages, 1M chars.
+// writes the review queue for the agent. Limits: 100 MB, 1000 pages, 3M chars.
 import {createHash} from 'node:crypto';
 import {writeFileSync,mkdirSync} from 'node:fs';
 import {extractText} from '../src/pdfText.ts';
@@ -20,7 +20,7 @@ const MAX_PER_RUN=Number(process.env.NUS_STUDY_MAX_DOCS||80);
   mkdirSync(local('files'),{recursive:true,mode:0o700});
   for(const doc of todo.slice(0,MAX_PER_RUN)){
     try{
-      const bytes=await downloadPdf(doc,token);
+      const bytes=await downloadPdf(doc,token,fetch,100*1024*1024);
       const hash=createHash('sha256').update(bytes).digest('hex'),prior:DocumentText|null=readJson(textPath(doc.id));
       writeFileSync(local('files',`${doc.id}.pdf`),bytes,{mode:0o600});
       if(prior?.hash===hash){writeJsonAtomic(textPath(doc.id),{...prior,metadataVersion:doc.metadataVersion});unchanged++;continue;}
